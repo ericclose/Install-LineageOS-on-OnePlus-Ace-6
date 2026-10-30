@@ -1,6 +1,6 @@
 # OnePlus Ace 6 刷入 LineageOS 教程
 
-本文将指引您将 OnePlus 刷入 [NullCode](https://t.me/nullcode1337) 适配的 LineageOS 系统，本文将涵盖一些常见问题的 workaround。
+本文将指引您将 OnePlus 刷入 [NullCode](https://t.me/nullcode1337) 维护适配的 LineageOS Official 系统。
 
 > 本文内容遵循 署名-非商业性使用-相同方式共享 4.0 国际 (CC BY-NC-SA 4.0) 协议
 > 
@@ -107,9 +107,9 @@ pnputil /add-driver "D:\Downloads\usb_driver\*.inf" /subdirs /install
   > 
   > * 解锁后**设备启动**将会提示“**设备已解锁 bootloader**”
   
-  * [一加深度测试公告&QA / 解锁 bootloader - OnePlus 官方社区](https://bbs.oneplus.com/thread/1926504022886318086)
+  * [一加深度测试公告&QA / 解锁 bootloader - OnePlus 官方社区](https://bbs.oneplus.com/thread/2175833961601695750)
 
-从官方社区下载好[深度测试.apk](https://bbsstatic.oneplus.com/public/apk/%E6%B7%B1%E5%BA%A6%E6%B5%8B%E8%AF%95.apk)，**提交深度测试申请通过审核后**，记得在开发者选项**已启用 OEM 解锁**。
+从官方社区下载好[深度测试.apk](https://oxygenos.oneplus.com/DeepTesting-bcf3709-all-all-domestic-all-release.apk)，**提交深度测试申请通过审核后**，记得在开发者选项**已启用 OEM 解锁**。
 
 请将设备启动至 bootloader 模式，执行命令即可解锁 bootloader：
 
@@ -127,10 +127,16 @@ fastboot flashing unlock
 
 * OnePlus Ace 6 非官方 LineagOS 刷机包和 recovery（recovery 为 LineageOS 包里提取而来）下载链接如下：
   
-  * [LineageOS 链接](https://drive.google.com/drive/u/3/folders/18h7izlH_RPC5JURUA8oXUgQxQbKZk_Os)
-  * [Lineage recovery 链接](https://github.com/ericclose/ktm/raw/refs/heads/main/lineage-recovery-ktm.img)
+  * [LineageOS 链接](https://download.lineageos.org/devices/ktm/builds)
   
-  > 下载 `lineage-*-ktm.zip`、和 `lineage-recovery-ktm.img` 即可。
+  > 下载以下文件： 
+  * `boot.img`
+  * `dtbo.img`
+  * `init_boot.img`
+  * `vbmeta.img`
+  * `vendor_boot.img`
+  * `recovery.img`
+  * `lineage-*-nightly-ktm-signed.zip`
 
 * LineageOS 的刷写：
 
@@ -139,15 +145,25 @@ fastboot flashing unlock
 # 官方镜像 “SuperHybrid Flasher A6 COS 16.x.x.xxx.zip” 下载地址：https://roms.danielspringer.at/index.php?dir=Oneplus+Ace+6%2FSuper+Flashers
 # 解压“SuperHybrid Flasher A6 COS 16.x.x.xxx.zip”的所有文件，将手机重启进入 bootloader 模式，执行两遍解压出来的 *.bat 文件即可
 
-# 刷入 recovery（将会替换官方 recovery 为 Lineage recovery）
-fastboot flash recovery lineage-recovery-ktm.img
+# 刷入启动 lineage recovery 所需的镜像
+fastboot flash boot boot.img
+fastboot flash dtbo dtbo.img
+fastboot flash init_boot init_boot.img
+fastboot flash vbmeta vbmeta.img
+fastboot flash vendor_boot vendor_boot.img
+
+# 重启进入 bootloader 模式
+fastboot reboot bootloader
+
+# 刷入 lineage recovery
+fastboot flash recovery recovery.img
 
 # 重启设备至 recovery 模式
 fastboot reboot recovery
 
 # 「Apply Update 应用更新」→「Apply from ADB 通过adb侧载更新」
 # 电脑执行命令刷入 LineageOS：
-adb sideload lineage-*-ktm.zip
+adb sideload lineage-*-nightly-ktm-signed.zip
 
 # 刷入系统之后，清进行格式化操作，完成后设备就可以开机进系统了
 # 「Factory Reset 工厂格式化」→「Format data/factory reset 格式化数据/工厂格式化」
@@ -158,20 +174,20 @@ adb sideload lineage-*-ktm.zip
 # 如果需要刷入 Gapps，建议刷入 MindTheGapps
 # MindTheGapps Wiki 链接（请根据您刷入系统的 Android 版本和处理器架构进行选择）： 
 # https://wiki.lineageos.org/gapps/
-# 如本文 LineageOS 23.2 对应 Android 16，现在的设备均是 ARM 架构 64 位。下载路径为：
-# https://github.com/MindTheGapps/16.0.0-arm64/releases/latest
-# 刚刷完 LineageOS 刷机包，得再先重启至 recovery 一次（否则可能遇到分区挂载失败，刷写报错）
+# 如本文 LineageOS 24 对应 Android 17，现在的设备均是 ARM 架构 64 位。下载路径为：
+# https://github.com/MindTheGapps/17.0.0-arm64/releases/latest
+# 刚刷完 LineageOS 刷机包，得再先重启至 recovery 一次（因为需要先切换到刚刷完 lineage 所在的新 slot，否则刷写失败）
 # 刷入方法一样是通过 adb sideload：
-adb sideload MindTheGapps-16.0.0-arm64-*.zip
+adb sideload MindTheGapps-17.0.0-arm64-*.zip
 
 # Magisk
 # 下载链接: https://github.com/topjohnwu/Magisk/releases
 # 建议至少开机一次，设置密码等保护后再刷入，这样才能保证设备处于加密状态
 # 刷入方式选择其中一种即可
-## 刷入方式①（ADB 侧载）：
+## 刷入方式 ①（ADB 侧载）：
 adb sideload Magisk*.apk
 # -------------------------------------------------------------------
-## 刷入方式②（fastboot 刷入修补后的 init_boot.img）：
+## 刷入方式 ②（fastboot 刷入修补后的 init_boot.img）：
 # 手机先安装 Magisk*.apk，打开后「Install 安装」→「Select and Patch a File 选择并修补文件」,
 # 选择 LineageOS 提取得到的 init_boot.img，选择修补，完成后得到 magisk_patched*.img，将文件传至电脑
 # 手机重启至 fastboot 模式，通过命令刷入 magisk_patched*.img：
@@ -183,14 +199,14 @@ fastboot flash init_boot magisk_patched*.img
 ## FAQ
 
 <details open>
-    <summary>本设备 LineageOS Unofficial 目前存在的问题（点击以收起）</summary>
+    <summary>如果本设备 LineageOS Official 存在问题，如何反馈（点击以收起）</summary>
 
-> 到目前为止，在最新的非官方 LineageOS 构建 `lineage-23.2-20260304-VANILLA-UNOFFICIAL-ktm.zip` 中发现了以下问题：
+> 在首次构建发布的官方 LineageOS 构建 `lineage-24.0-20261030-nightly-ktm-signed.zip` 中暂未发现问题。
 > 
-> 1. 默认设定的情况下锁屏，**双击唤醒屏幕暂不可用**，暂时的处理方式是：启用 AOD（熄屏显示）后即可使用该功能
+> 若发现问题或 bug，可抓取 adb logcat 日志，于官方 [issues](https://github.com/LineageOS/issues/issues) 区域或联系 [NullCode](https://t.me/nullcode1337) 反馈
 
 </details>
 
 ## 参考资料
 
-* [[ROM] [UNOFFICIAL] LineageOS 23.2 for OnePlus Ace 6 (ktm)](https://xdaforums.com/t/rom-unofficial-lineageos-23-2-for-oneplus-ace-6-ktm.4781127/)
+* [Install LineageOS on ktm | LineageOS Wiki](https://wiki.lineageos.org/devices/ktm/install)
